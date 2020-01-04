@@ -30,16 +30,16 @@ namespace DynamicRulesDemo.Controllers
                     var logics2Apply = rules.Where(x =>
                         x.RuleNature == RuleNature.Assignment &&
                         (string.IsNullOrWhiteSpace(x.ValidationDefination) ||
-                         entity.Vaidate(rulekey, x.ValidationDefination, _cache)));
+                         entity.Vaidate(Db, x.ValidationDefination, _cache)));
 
                     foreach (var rule in logics2Apply)
                     {
-                        entity.ApplyRule(this, rule.AssignmentDefination, _cache);
+                        entity.ApplyRule(Db, rule.AssignmentDefination, _cache);
                     }
                     var failedvalidations = rules.Where(x =>
                         !string.IsNullOrWhiteSpace(x.ValidationDefination) &&
                         x.RuleNature == RuleNature.Validation &&
-                        !entity.Vaidate(rulekey, x.ValidationDefination, _cache));
+                        !entity.Vaidate(Db, x.ValidationDefination, _cache));
                     int errornum = 0;
                     foreach (var failedvalidation in failedvalidations)
                     {

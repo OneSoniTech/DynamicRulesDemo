@@ -51,6 +51,16 @@ namespace DynamicRulesDemo.Models.Db
                             Description = "Stop user from passing expense amount more than INR 100000",
                             IsActive = true,
                             RuleNature = RuleNature.Validation
+                        },
+                        new Rule
+                        {
+                            RuleKey = "CoreValidation_ExpenseLog",
+                            ValidationDefination = "(vw.Expenses.Where(EmployeeName==x.EmployeeName).Sum(Amount)+x.Amount)<=50000",
+                            ExecutionOrder = 0,
+                            FailedMessage = "This Employee has exceeded maximum expenses allowed for Travelling(INR 50000).",
+                            Description = "Stop user from passing expenses more than INR 50000 to single person for travelling",
+                            IsActive = true,
+                            RuleNature = RuleNature.Validation
                         });
                     context.SaveChanges();
                 }
