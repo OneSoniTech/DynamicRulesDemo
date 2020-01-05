@@ -11,18 +11,17 @@ namespace DynamicRulesDemo
     /// https://www.psclistens.com/insight/blog/quickly-build-a-business-rules-engine-using-c-and-lambda-expression-trees/
     public static class PrecompiledRules
     {
-        private static readonly Dictionary<string, object> Symbols = new Dictionary<string, object>()
-        {
+        private static readonly Dictionary<string, object> Symbols = new Dictionary<string, object>() {
             // {"user", CoreSetting.User},
             //{"db", CoreSetting.DbContext},
             //{"odata", CoreSetting.ODataClient}
-        };
+        };       
 
-        public static bool Vaidate<T, TContext>(this T parameter, TContext ctx, string predicate, IMemoryCache memoryCache) where T : class
+        public static bool Vaidate<T, TContext>(this T parameter, TContext ctx, string predicate,IMemoryCache memoryCache) where T : class
         {
             try
             {
-                return ValidateCore<T, TContext>(predicate, memoryCache)(parameter, ctx);
+                return ValidateCore<T, TContext>(predicate,memoryCache)(parameter, ctx);
             }
             catch (Exception e)
             {
@@ -35,7 +34,7 @@ namespace DynamicRulesDemo
         {
             try
             {
-                return ValidateCore<T>(predicate, memoryCache)(parameter);
+                return ValidateCore<T>(predicate,memoryCache)(parameter);
             }
             catch (Exception e)
             {
@@ -78,7 +77,7 @@ namespace DynamicRulesDemo
             where T : class
             where TContext : class
         {
-            ApplyRuleCore<T, TContext>(expression, memoryCache).DynamicInvoke(parameter, ctx);
+            ApplyRuleCore<T, TContext>(expression,memoryCache).DynamicInvoke(parameter, ctx);
         }
         public static Delegate ApplyRuleCore<T, TContext>(string expression, IMemoryCache memoryCache) where T : class
         {
@@ -97,7 +96,7 @@ namespace DynamicRulesDemo
 
         public static void ApplyRule<T>(this T parameter, string expression, IMemoryCache memoryCache) where T : class
         {
-            ApplyRuleCore<T>(expression, memoryCache)?.DynamicInvoke(parameter);
+            ApplyRuleCore<T>(expression,memoryCache)?.DynamicInvoke(parameter);
         }
         public static Delegate ApplyRuleCore<T>(string expression, IMemoryCache memoryCache) where T : class
         {

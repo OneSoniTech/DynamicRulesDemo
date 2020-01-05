@@ -1,12 +1,14 @@
-﻿using DynamicRulesDemo.Models;
-using DynamicRulesDemo.Models.Db;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using DynamicRulesDemo.Models;
+using DynamicRulesDemo.Models.Db;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DynamicRulesDemo.Controllers
 {
@@ -14,8 +16,8 @@ namespace DynamicRulesDemo.Controllers
     [ApiController]
     public class ExpenseLogsController : RuleBasedController
     {
-
-        public ExpenseLogsController(ILogger<ExpenseLogsController> logger, OneTechDbContext context, IMemoryCache cache) : base(logger, context, cache)
+        
+        public ExpenseLogsController(ILogger<ExpenseLogsController> logger,OneTechDbContext context,IMemoryCache cache):base(logger,context,cache)
         {
         }
 
@@ -50,7 +52,7 @@ namespace DynamicRulesDemo.Controllers
             {
                 return BadRequest();
             }
-            ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Entry(expenseLog).State = EntityState.Modified;
 
@@ -79,7 +81,7 @@ namespace DynamicRulesDemo.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseLog>> PostExpenseLog([FromBody]ExpenseLog expenseLog)
         {
-            ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Expenses.Add(expenseLog);
             try
@@ -110,7 +112,7 @@ namespace DynamicRulesDemo.Controllers
             {
                 return NotFound();
             }
-            ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Expenses.Remove(expenseLog);
             await Db.SaveChangesAsync();

@@ -17,7 +17,7 @@ namespace DynamicRulesDemo.Controllers
     public class RulesController : RuleBasedController
     {
 
-        public RulesController(ILogger<RulesController> logger, OneTechDbContext context,IMemoryCache cache) : base(logger, context,cache)
+        public RulesController(ILogger<RulesController> logger, OneTechDbContext context, IMemoryCache cache) : base(logger, context, cache)
         {
         }
 
