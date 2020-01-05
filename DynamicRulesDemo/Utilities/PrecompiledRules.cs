@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace DynamicRulesDemo
@@ -10,17 +11,18 @@ namespace DynamicRulesDemo
     /// https://www.psclistens.com/insight/blog/quickly-build-a-business-rules-engine-using-c-and-lambda-expression-trees/
     public static class PrecompiledRules
     {
-        private static readonly Dictionary<string, object> Symbols = new Dictionary<string, object>() {
+        private static readonly Dictionary<string, object> Symbols = new Dictionary<string, object>()
+        {
             // {"user", CoreSetting.User},
             //{"db", CoreSetting.DbContext},
             //{"odata", CoreSetting.ODataClient}
-        };       
+        };
 
-        public static bool Vaidate<T, TContext>(this T parameter, TContext ctx, string predicate,IMemoryCache memoryCache) where T : class
+        public static bool Vaidate<T, TContext>(this T parameter, TContext ctx, string predicate, IMemoryCache memoryCache) where T : class
         {
             try
             {
-                return ValidateCore<T, TContext>(predicate,memoryCache)(parameter, ctx);
+                return ValidateCore<T, TContext>(predicate, memoryCache)(parameter, ctx);
             }
             catch (Exception e)
             {
@@ -33,7 +35,7 @@ namespace DynamicRulesDemo
         {
             try
             {
-                return ValidateCore<T>(predicate,memoryCache)(parameter);
+                return ValidateCore<T>(predicate, memoryCache)(parameter);
             }
             catch (Exception e)
             {
@@ -51,7 +53,7 @@ namespace DynamicRulesDemo
             }
             ParameterExpression view = Expression.Parameter(typeof(TContext), "vw");
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            Expression<Func<T, TContext, bool>> lambda = (Expression<Func<T, TContext, bool>>)DynamicExpression.ParseLambda(new ParameterExpression[] { x, view }, typeof(bool),
+            Expression<Func<T, TContext, bool>> lambda = (Expression<Func<T, TContext, bool>>)DynamicExpressionParser.ParseLambda(new ParameterExpression[] { x, view }, typeof(bool),
                 predicate, Symbols);
             var compiled = lambda.Compile();
             memoryCache.Set(predicate, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
@@ -65,7 +67,7 @@ namespace DynamicRulesDemo
                 return fun;
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            Expression<Func<T, bool>> lambda = (Expression<Func<T, bool>>)DynamicExpression.ParseLambda(new ParameterExpression[] { x }, typeof(bool),
+            Expression<Func<T, bool>> lambda = (Expression<Func<T, bool>>)DynamicExpressionParser.ParseLambda(new ParameterExpression[] { x }, typeof(bool),
                 predicate, Symbols);
             var compiled = lambda.Compile();
             memoryCache.Set(predicate, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
@@ -76,7 +78,7 @@ namespace DynamicRulesDemo
             where T : class
             where TContext : class
         {
-            ApplyRuleCore<T, TContext>(expression,memoryCache).DynamicInvoke(parameter, ctx);
+            ApplyRuleCore<T, TContext>(expression, memoryCache).DynamicInvoke(parameter, ctx);
         }
         public static Delegate ApplyRuleCore<T, TContext>(string expression, IMemoryCache memoryCache) where T : class
         {
@@ -87,7 +89,7 @@ namespace DynamicRulesDemo
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
             ParameterExpression view = Expression.Parameter(typeof(TContext), "vw");
-            var body = DynamicExpression.ParseLambda(new[] { x, view }, null, expression, Symbols);
+            var body = DynamicExpressionParser.ParseLambda(new[] { x, view }, null, expression, Symbols);
             var compiled = body.Compile();
             memoryCache.Set(expression, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
             return compiled;
@@ -95,7 +97,7 @@ namespace DynamicRulesDemo
 
         public static void ApplyRule<T>(this T parameter, string expression, IMemoryCache memoryCache) where T : class
         {
-            ApplyRuleCore<T>(expression,memoryCache)?.DynamicInvoke(parameter);
+            ApplyRuleCore<T>(expression, memoryCache)?.DynamicInvoke(parameter);
         }
         public static Delegate ApplyRuleCore<T>(string expression, IMemoryCache memoryCache) where T : class
         {
@@ -105,7 +107,7 @@ namespace DynamicRulesDemo
                 return fun;
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            var body = DynamicExpression.ParseLambda(new[] { x }, null, expression, Symbols);
+            var body = DynamicExpressionParser.ParseLambda(new[] { x }, null, expression, Symbols);
 
             var compiled = body.Compile();
             memoryCache.Set(expression, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
