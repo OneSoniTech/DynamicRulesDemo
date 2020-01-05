@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace DynamicRulesDemo
@@ -51,7 +52,7 @@ namespace DynamicRulesDemo
             }
             ParameterExpression view = Expression.Parameter(typeof(TContext), "vw");
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            Expression<Func<T, TContext, bool>> lambda = (Expression<Func<T, TContext, bool>>)DynamicExpression.ParseLambda(new ParameterExpression[] { x, view }, typeof(bool),
+            Expression<Func<T, TContext, bool>> lambda = (Expression<Func<T, TContext, bool>>)DynamicExpressionParser.ParseLambda(new ParameterExpression[] { x, view }, typeof(bool),
                 predicate, Symbols);
             var compiled = lambda.Compile();
             memoryCache.Set(predicate, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
@@ -65,7 +66,7 @@ namespace DynamicRulesDemo
                 return fun;
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            Expression<Func<T, bool>> lambda = (Expression<Func<T, bool>>)DynamicExpression.ParseLambda(new ParameterExpression[] { x }, typeof(bool),
+            Expression<Func<T, bool>> lambda = (Expression<Func<T, bool>>)DynamicExpressionParser.ParseLambda(new ParameterExpression[] { x }, typeof(bool),
                 predicate, Symbols);
             var compiled = lambda.Compile();
             memoryCache.Set(predicate, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
@@ -87,7 +88,7 @@ namespace DynamicRulesDemo
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
             ParameterExpression view = Expression.Parameter(typeof(TContext), "vw");
-            var body = DynamicExpression.ParseLambda(new[] { x, view }, null, expression, Symbols);
+            var body = DynamicExpressionParser.ParseLambda(new[] { x, view }, null, expression, Symbols);
             var compiled = body.Compile();
             memoryCache.Set(expression, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));
             return compiled;
@@ -105,7 +106,7 @@ namespace DynamicRulesDemo
                 return fun;
             }
             ParameterExpression x = Expression.Parameter(typeof(T), "x");
-            var body = DynamicExpression.ParseLambda(new[] { x }, null, expression, Symbols);
+            var body = DynamicExpressionParser.ParseLambda(new[] { x }, null, expression, Symbols);
 
             var compiled = body.Compile();
             memoryCache.Set(expression, compiled, absoluteExpiration: DateTimeOffset.Now.AddHours(24));

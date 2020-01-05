@@ -9,18 +9,19 @@ using System.Threading.Tasks;
 
 namespace DynamicRulesDemo.Controllers
 {
-    public class RuleBasedController: ControllerBase
+    public class RuleBasedController : ControllerBase
     {
         protected readonly OneTechDbContext Db;
         private readonly IMemoryCache _cache;
         protected readonly ILogger<RuleBasedController> Log;
-        public RuleBasedController(ILogger<RuleBasedController> logger, OneTechDbContext context,IMemoryCache cache)
+        public RuleBasedController(ILogger<RuleBasedController> logger, OneTechDbContext context, IMemoryCache cache)
         {
             Log = logger;
             Db = context;
             _cache = cache;
         }
-    public void ExecuteRules<TEntity>(string rulekey,TEntity entity) where TEntity:class
+
+        public void ExecuteRules<TEntity>(string rulekey, TEntity entity) where TEntity : class
         {
             var rules = Db.Rules.Where(x => x.IsActive && x.RuleKey == rulekey).ToList();
             if (rules != null)
@@ -30,7 +31,7 @@ namespace DynamicRulesDemo.Controllers
                     var logics2Apply = rules.Where(x =>
                         x.RuleNature == RuleNature.Assignment &&
                         (string.IsNullOrWhiteSpace(x.ValidationDefination) ||
-                         entity.Vaidate(Db, x.ValidationDefination, _cache))).OrderBy(x=>x.ExecutionOrder);
+                         entity.Vaidate(Db, x.ValidationDefination, _cache))).OrderBy(x => x.ExecutionOrder);
 
                     foreach (var rule in logics2Apply)
                     {
