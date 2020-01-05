@@ -14,7 +14,7 @@ namespace DynamicRulesDemo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RulesController : OneTechController
+    public class RulesController : RuleBasedController
     {
 
         public RulesController(ILogger<RulesController> logger, OneTechDbContext context,IMemoryCache cache) : base(logger, context,cache)

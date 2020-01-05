@@ -14,7 +14,7 @@ namespace DynamicRulesDemo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExpenseLogsController : OneTechController
+    public class ExpenseLogsController : RuleBasedController
     {
         
         public ExpenseLogsController(ILogger<ExpenseLogsController> logger,OneTechDbContext context,IMemoryCache cache):base(logger,context,cache)
@@ -52,7 +52,7 @@ namespace DynamicRulesDemo.Controllers
             {
                 return BadRequest();
             }
-            base.RunRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Entry(expenseLog).State = EntityState.Modified;
 
@@ -81,7 +81,7 @@ namespace DynamicRulesDemo.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseLog>> PostExpenseLog([FromBody]ExpenseLog expenseLog)
         {
-            base.RunRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Expenses.Add(expenseLog);
             try
@@ -112,7 +112,7 @@ namespace DynamicRulesDemo.Controllers
             {
                 return NotFound();
             }
-            base.RunRules("CoreValidation_ExpenseLog", expenseLog);
+            base.ExecuteRules("CoreValidation_ExpenseLog", expenseLog);
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             Db.Expenses.Remove(expenseLog);
             await Db.SaveChangesAsync();
